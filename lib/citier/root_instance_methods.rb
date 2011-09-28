@@ -7,7 +7,8 @@ module Citier
     # make sure we're not leaving children behind
     def as_child
       #instance_class = Object.const_get(self.type)
-      return bottom_class_instance = Kernel.const_get(self.type).where(:id => self.id).first
+      return bottom_class_instance = Kernel.const_get(self.type).where(:id => self.id).first if self.type
+      return self if self.is_root? # Return self if we have no child
     end
   
     # Access the root class if ever you need.
