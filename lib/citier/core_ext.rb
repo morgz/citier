@@ -48,11 +48,11 @@ def reset_table_info(theclass)
 end
 
 def create_citier_view(theclass)  #function for creating views for migrations 
-  self_columns = theclass.column_names.select{ |c| c != "id" }
+  self_columns = theclass::Writable.column_names.select{ |c| c != "id" }
   parent_columns = theclass.superclass.column_names.select{ |c| c != "id" }
   columns = parent_columns+self_columns
-  self_read_table = "view_#{ theclass.table_name }"
-  self_write_table = theclass.table_name
+  self_read_table = theclass.table_name
+  self_write_table = theclass::Writable.table_name
   parent_read_table = theclass.superclass.table_name
   sql = "CREATE VIEW #{self_read_table} AS SELECT #{parent_read_table}.id, #{columns.join(',')} FROM #{parent_read_table}, #{self_write_table} WHERE #{parent_read_table}.id = #{self_write_table}.id" 
   
