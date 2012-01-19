@@ -43,7 +43,7 @@ module Citier
       
           # If we're root (AR subclass) this will just be saved as normal through AR. If we're a child it will call this method again. 
           # It will try and save it's parent and then save itself through the Writable constant.
-          parent_saved = parent.save
+          parent_saved = parent.save(:validate => options[:validate])
           self.id = parent.id
 
           if !parent_saved
