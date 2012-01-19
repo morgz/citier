@@ -29,25 +29,22 @@ class ActiveRecord::Base
 
       # set the name of the table associated to this class
       # this class will be associated to the writable table of the class_reference class
-      set_table_name(t_name)
+      self.table_name = t_name
     end
   end
 end
 
-def reset_table_info(theclass)
-  
-  #flush any column info in memory
-  #Loops through and stops once we've cleaned up to our root class.
-  reset_class = theclass  
+def create_citier_view(theclass)  #function for creating views for migrations 
+  # flush any column info in memory
+  # Loops through and stops once we've cleaned up to our root class.
+  # We MUST user Writable as that is the place where changes might reside!
+  reset_class = theclass::Writable 
   until reset_class == ActiveRecord::Base
     citier_debug("Resetting column information on #{reset_class}")
     reset_class.reset_column_information
     reset_class = reset_class.superclass
   end
-  
-end
 
-def create_citier_view(theclass)  #function for creating views for migrations 
   self_columns = theclass::Writable.column_names.select{ |c| c != "id" }
   parent_columns = theclass.superclass.column_names.select{ |c| c != "id" }
   columns = parent_columns+self_columns
@@ -57,7 +54,7 @@ def create_citier_view(theclass)  #function for creating views for migrations
   sql = "CREATE VIEW #{self_read_table} AS SELECT #{parent_read_table}.id, #{columns.join(',')} FROM #{parent_read_table}, #{self_write_table} WHERE #{parent_read_table}.id = #{self_write_table}.id" 
   
   #Use our rails_sql_views gem to create the view so we get it outputted to schema
-  create_view "#{self_read_table}", "SELECT #{parent_read_table}.id, #{columns.join(',')} FROM #{parent_read_table}, #{self_write_table} WHERE #{parent_read_table}.id = #{self_write_table}.id", do |v|
+  create_view "#{self_read_table}", "SELECT #{parent_read_table}.id, #{columns.join(',')} FROM #{parent_read_table}, #{self_write_table} WHERE #{parent_read_table}.id = #{self_write_table}.id" do |v|
     v.column :id
     columns.each do |c|
       v.column c.to_sym
@@ -67,8 +64,7 @@ def create_citier_view(theclass)  #function for creating views for migrations
   citier_debug("Creating citier view -> #{sql}")
   #theclass.connection.execute sql
   
-  reset_table_info(theclass)
-  
+ 
 end
 
 def drop_citier_view(theclass) #function for dropping views for migrations 
@@ -79,9 +75,6 @@ def drop_citier_view(theclass) #function for dropping views for migrations
   
   citier_debug("Dropping citier view -> #{sql}")
   #theclass.connection.execute sql
-  
-  reset_table_info(theclass)
-  
 end
 
 def update_citier_view(theclass) #function for updating views for migrations
