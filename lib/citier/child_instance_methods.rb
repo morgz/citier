@@ -39,7 +39,13 @@ module Citier
           parent.id = self.id if id
           parent.type = self.type
     
-          parent.is_new_record(new_record?)
+          #All because the child is a new record doesn't mean the facility has to be. We may have created the facility first 
+          # and then manually set the ID of the child
+          if parent.id
+            parent.is_new_record(!self.class.superclass.exists?(self.id))
+          else
+            parent.is_new_record(new_record?)
+          end
       
           # If we're root (AR subclass) this will just be saved as normal through AR. If we're a child it will call this method again. 
           # It will try and save it's parent and then save itself through the Writable constant.
@@ -62,7 +68,7 @@ module Citier
 
 
           # If there are attributes for the current class (unique & not inherited), save current model
-          if !attributes_for_current.empty?
+          if !attributes_for_current.empty? || self.new_record? 
             current = self.class::Writable.new
         
             current.force_attributes(attributes_for_current, :merge => true)
