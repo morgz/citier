@@ -24,7 +24,10 @@ module Citier
          parent.id = self.id
          parent.type = self.type
        
-         parent.is_new_record(new_record?)
+         unless new_record?  
+           parent.reload #we need to reload the object to clear the active record dirty changes. Doubt this is the most efficent way. discovered this while trying to set a value to nil after after getting a Citier model .as_root instance
+           parent.is_new_record(false)
+         end
 
          parent
        else
