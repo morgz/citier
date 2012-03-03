@@ -114,7 +114,7 @@ def update_all_citier_views_for_root_class(klass)
   #Don't include our main class as there is no view
   #Delete anything that isn't a descendent of our class
    citier_classes = Dir['app/models/*.rb'].map {|f| File.basename(f, '.*').camelize.constantize }.delete_if do |the_class| 
-     !the_class.acts_as_citier? || the_class == klass || the_class.base_class != klass  
+     !the_class.respond_to?(:acts_as_citier?) || !the_class.acts_as_citier? || the_class == klass || the_class.base_class != klass  
    end
    
    #citier_debug("Updated ALL #{citier_classes}")
