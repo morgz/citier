@@ -105,3 +105,23 @@ def create_or_update_citier_view(theclass) #Convienience function for updating o
   end
   
 end
+
+# Used if you update the root model and want to update all subsequent views.
+def update_all_citier_views_for_root_class(klass)
+  
+  # The condition for delete_if checks for...
+  #We're only interested in classes which are in our acting class :)
+  #Don't include our main class as there is no view
+  #Delete anything that isn't a descendent of our class
+   citier_classes = Dir['app/models/*.rb'].map {|f| File.basename(f, '.*').camelize.constantize }.delete_if do |the_class| 
+     !the_class.acts_as_citier? || the_class == klass || the_class.base_class != klass  
+   end
+   
+   #citier_debug("Updated ALL #{citier_classes}")
+   #debugger
+   #Now update all the relevent views
+   citier_classes.each do |citier_class|
+     update_citier_view(citier_class)
+   end
+   
+end
