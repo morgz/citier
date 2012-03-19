@@ -48,6 +48,11 @@ def create_citier_view(theclass)  #function for creating views for migrations
     reset_class = reset_class.superclass
   end
 
+  #Need to reset column information on the writable class
+  theclass::Writable.reset_column_information
+  #May not need to reset info on the superclass as it could have been covered above but worth doing. Won't harm hey?
+  theclass.superclass.reset_column_information
+  
   self_columns = theclass::Writable.column_names.select{ |c| c != "id" }
   parent_columns = theclass.superclass.column_names.select{ |c| c != "id" }
   columns = parent_columns+self_columns
