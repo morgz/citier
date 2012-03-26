@@ -49,6 +49,7 @@ def create_citier_view(theclass)  #function for creating views for migrations
   end
 
   #Need to reset column information on the writable class
+  #Found had to do this when updating multile sub classes in single migration & running update_all_citier_views_for_root_class
   theclass::Writable.reset_column_information
   #May not need to reset info on the superclass as it could have been covered above but worth doing. Won't harm hey?
   theclass.superclass.reset_column_information

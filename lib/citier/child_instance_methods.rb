@@ -79,8 +79,6 @@ module Citier
       
             current_saved = current.save
             
-            current.after_save_change_request if current.respond_to?('after_save_change_request') #Specific to an app I'm building
-
             if !current_saved
               citier_debug("Class (#{self.class.superclass.to_s}) could not be saved")
               citier_debug("Errors = #{current.errors.to_s}")
