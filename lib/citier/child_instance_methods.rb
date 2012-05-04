@@ -39,6 +39,13 @@ module Citier
           parent.id = self.id if id
           parent.type = self.type
     
+          ########
+          ##
+          ## Specific to app owned danmorgz@gmail.com
+          if self.respond_to?(:skip_change_requests) && parent.respond_to?(:skip_change_requests)
+            parent.skip_change_requests = self.skip_change_requests #pass on the attr_accessor to parent
+          end
+
           #All because the child is a new record doesn't mean the facility has to be. We may have created the facility first 
           # and then manually set the ID of the child
           if parent.id
