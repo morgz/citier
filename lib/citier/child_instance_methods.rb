@@ -10,7 +10,7 @@ module Citier
 
       #AIT NOTE: Will change any protected values back to original values so any models onwards won't see changes.
       # Run save and create/update callbacks, just like ActiveRecord does
-      self.run_callbacks(:save) do
+      can_save = self.run_callbacks(:save) do
         self.run_callbacks(self.new_record? ? :create : :update) do
           #get the attributes of the class which are inherited from it's parent.
           attributes_for_parent = self.attributes.reject { |key,value| !self.class.superclass.column_names.include?(key) }
@@ -102,7 +102,7 @@ module Citier
           # No return, because we want the after callback to run.
         end
       end
-      return true
+      return can_save
     end
   
     def save!(options={})
